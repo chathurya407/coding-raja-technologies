@@ -1,0 +1,60 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+import random
+
+# Initialize NLTK
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+# Sample dataset of conversations
+dataset = {
+    "greetings": ["hello", "hi", "hey", "howdy", "greetings"],
+    "goodbye": ["bye", "goodbye", "see you later", "take care"],
+    "thanks": ["thank you", "thanks", "appreciate it"],
+    "weather": ["What's the weather like today?", "Tell me about the weather", "Weather forecast"],
+}
+
+# Preprocessing functions
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
+    tokens = [token for token in tokens if token not in stopwords.words('english')]
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(token) for token in tokens]
+    return tokens
+# Intent recognition
+def recognize_intent(tokens):
+    for intent, patterns in dataset.items():
+        for pattern in patterns:
+            if all(word in tokens for word in preprocess_text(pattern)):
+                return intent
+    return None
+
+# Response generation
+def generate_response(intent):
+    responses = {
+        "greetings": ["Hello!", "Hi there!", "Hey, how can I help?"],
+        "goodbye": ["Goodbye!", "See you later!", "Take care!"],
+        "thanks": ["You're welcome!", "No problem!", "Glad to help!"],
+        "weather": ["The weather is sunny today.", "It's going to rain later.", "Expect cloudy skies."],
+    }
+    return random.choice(responses.get(intent, ["Sorry, I don't understand that."]))
+
+# Main function to interact with the user
+def chat():
+    print("Chatbot: Hello! How can I assist you today?")
+    while True:
+        user_input = input("You: ").lower()
+        if user_input == 'exit':
+            print("Chatbot: Goodbye!")
+            break
+        tokens = preprocess_text(user_input)
+        intent = recognize_intent(tokens)
+        response = generate_response(intent)
+        print("Chatbot:", response)
+
+# Start the chat
+if _name_ == "_main_":
+    chat()
